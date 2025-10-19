@@ -31,6 +31,30 @@ def require_permissions(*required_permissions: str)-> Callable[[HeaderUser], Hea
         return user
     return dependency
 
+def require_one_of_permissions(*permissions: str)-> Callable[[HeaderUser], HeaderUser]:
+    """
+    Check if user has one of required permissions
+    Args:
+        *permissions: list of required permissions
+
+    Returns:
+        HeaderUser:
+
+    """
+
+    def dependency(user: HeaderUser = Depends(get_user)) -> HeaderUser:
+        founded_permissions = []
+        for prem in permissions:
+            if prem in user.permissions:
+                founded_permissions.append(prem)
+        if not founded_permissions:
+            raise UnauthorisedProblem(
+                detail=f"Insufficient rights. Required: {', '.join(permissions)}"
+            )
+        return user
+    return dependency
+
+
 
 def require_roles(*required_roles: str):
     def dependency(user: HeaderUser = Depends(get_user)) -> HeaderUser:
