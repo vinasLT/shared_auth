@@ -1,6 +1,6 @@
 [project]
 name = "authtools"
-version = "0.1.0"
+version = "0.1.5"
 description = "Shared auth library for FastAPI"
 authors = [
     { name = "peyro", email = "peyrovskaaa@gmail.com" }
