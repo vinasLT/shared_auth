@@ -1,7 +1,7 @@
 from typing import Callable
 
 from fastapi import Depends
-from rfc9457 import UnauthorisedProblem
+from rfc9457 import ForbiddenProblem
 
 from AuthTools.Permissions.serialize import get_user
 from AuthTools.models.user import HeaderUser
@@ -25,7 +25,7 @@ def require_permissions(*required_permissions: str)-> Callable[[HeaderUser], Hea
         ]
 
         if missing_permissions:
-            raise UnauthorisedProblem(
+            raise ForbiddenProblem(
                 detail=f"Insufficient rights. Required: {', '.join(missing_permissions)}"
             )
         return user
@@ -48,7 +48,7 @@ def require_one_of_permissions(*permissions: str)-> Callable[[HeaderUser], Heade
             if prem in user.permissions:
                 founded_permissions.append(prem)
         if not founded_permissions:
-            raise UnauthorisedProblem(
+            raise ForbiddenProblem(
                 detail=f"Insufficient rights. Required: {', '.join(permissions)}"
             )
         return user
@@ -59,7 +59,7 @@ def require_one_of_permissions(*permissions: str)-> Callable[[HeaderUser], Heade
 def require_roles(*required_roles: str):
     def dependency(user: HeaderUser = Depends(get_user)) -> HeaderUser:
         if not any(role in user.roles for role in required_roles):
-            raise UnauthorisedProblem(
+            raise ForbiddenProblem(
                 detail=f"One of the roles is required: {', '.join(required_roles)}"
             )
         return user
